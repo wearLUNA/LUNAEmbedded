@@ -129,17 +129,24 @@ bool processJsonPayload(const char *payload) {
   Serial.print("Password: ");
   Serial.println(receivedPassword);
 
-  // Store the credentials permanently.
-  storeCredentials(receivedSSID, receivedPassword);
-
   // Optionally connect to the new WiFi network immediately.
-  WiFi.begin(receivedSSID, receivedPassword);
-  Serial.println("\nConnecting");
+  unsigned long startAttemptTime = millis();
+  const unsigned long timeout = 20000; // 20 seconds
+
   while (WiFi.status() != WL_CONNECTED) {
+    if (millis() - startAttemptTime >= timeout) {
+      Serial.println(
+          "\nFailed to connect to WiFi. Check password or network try again.");
+      break;
+    }
     Serial.print(".");
     delay(100);
   }
+
   Serial.println("\nConnected to the WiFi network");
+  // Store the credentials permanently.
+  storeCredentials(receivedSSID, receivedPassword);
+  
   Serial.print("Local ESP32 IP: ");
   Serial.println(WiFi.localIP());
 

@@ -6,7 +6,6 @@ bool useAccessPoint = false;
 
 void setup() {
   Serial.begin(115200);
-
   delay(2000);
   if (!AccessPoint::hasWifiCreds()) {
     Serial.println("No Wifi credentials found. Starting server.");
