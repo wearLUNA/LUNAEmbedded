@@ -12,7 +12,12 @@ void setup() {
     AccessPoint::setupAccessPoint();
     useAccessPoint = true;
   } else {
-    AccessPoint::connectToWifi();
+    bool connected = AccessPoint::connectToWifi();
+    if (!connected) {
+      Serial.println("Starting Server");
+      AccessPoint::setupAccessPoint();
+      useAccessPoint = true;
+    }
   }
 }
 

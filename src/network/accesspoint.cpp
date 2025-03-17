@@ -17,9 +17,6 @@ Preferences preferences;
 
 namespace AccessPoint {
 
-/**
- * Starts the WiFi Server at port 80 and sets the appropriate SSID and Password
- */
 void setupAccessPoint() {
   Serial.print("Setting AP");
   WiFi.softAP(AP_SSID, AP_PASSWORD);
@@ -29,20 +26,15 @@ void setupAccessPoint() {
   server.begin();
 }
 
-/**
- * Stores credentials persistently using Preferences
- */
 void storeCredentials(const char *newSSID, const char *newPassword) {
   preferences.begin("wifiCreds", false);
   preferences.putString("ssid", newSSID);
   preferences.putString("password", newPassword);
   preferences.end();
+  delay(1000);
   Serial.println("Credentials stored persistently.");
 }
 
-/**
- * Checks if the persistent data has WiFi credentials
- */
 bool hasWifiCreds() {
   preferences.begin("wifiCreds", false);
   String storedSSID = preferences.getString("ssid", "");
@@ -51,9 +43,6 @@ bool hasWifiCreds() {
   return storedSSID != "";
 }
 
-/**
- * Function to be used later.
- */
 // TODO: use this somewhere. Add a button to reset or something
 void clearWifiCreds() {
   preferences.begin("wifiCreds", false);
@@ -63,25 +52,62 @@ void clearWifiCreds() {
   Serial.println("WiFi credentials cleared.");
 }
 
-/**
- * Uses the stored Wifi Credentials to login to wifi.
- */
-void connectToWifi() {
-  if (hasWifiCreds()) {
-    preferences.begin("wifiCreds", true);
-    WiFi.begin(preferences.getString("ssid"),
-               preferences.getString("password"));
-    Serial.println("\nConnecting");
-    while (WiFi.status() != WL_CONNECTED) {
-      Serial.print(".");
-      delay(100);
-    }
+bool connectToWifi() {
+  if (!hasWifiCreds()) {
+    Serial.println("\nFailed to connect to WiFi network. No SSID or Pasword");
+    return false;
+  }
+
+  preferences.begin("wifiCreds", true);
+  if (!isNetworkVisible(preferences.getString("ssid"))) {
+    Serial.println("\nNetwork not found. Check if the WiFi is in range.");
+    return false;
+  }
+  
+  bool connected = _connectToWifi(preferences.getString("ssid"),
+                                  preferences.getString("password"));
+  preferences.end();
+  if (connected) {
     Serial.println("\nConnected to the WiFi network");
     Serial.print("Local ESP32 IP: ");
     Serial.println(WiFi.localIP());
-    return;
+    return true;
+  } else {
+    // TODO find a way to figure out which option happened and handle the network error. Look into system_event_info_t. for now assume strong WiFi signals always
+    Serial.println(
+        "\nFailed to connect to WiFi. Check password or network try again.");
+    return false;
   }
-  Serial.println("\nFailed to connect to WiFi network. No SSID or Pasword");
+}
+
+bool _connectToWifi(const String &ssid, const String &password) {
+  unsigned long startAttemptTime = millis();
+  const unsigned long timeout = 20000; // 20 seconds
+
+  WiFi.begin(ssid, password);
+  if (millis() - startAttemptTime >= timeout) {
+    while (WiFi.status() != WL_CONNECTED) {
+      return false;
+    }
+    Serial.print(".");
+    delay(100);
+  }
+  return true;
+}
+
+
+bool isNetworkVisible(const String &targetSSID) {
+  Serial.println("Scanning for available networks...");
+  int numNetworks = WiFi.scanNetworks();
+  Serial.println("Scan complete.");
+
+  for (int i = 0; i < numNetworks; i++) {
+    String ssid = WiFi.SSID(i);
+    if (ssid == targetSSID) {
+      return true;
+    }
+  }
+  return false;
 }
 
 /**
@@ -129,33 +155,25 @@ bool processJsonPayload(const char *payload) {
   Serial.print("Password: ");
   Serial.println(receivedPassword);
 
-  // Optionally connect to the new WiFi network immediately.
   unsigned long startAttemptTime = millis();
+  // Optionally connect to the new WiFi network immediately.
   const unsigned long timeout = 20000; // 20 seconds
 
-  while (WiFi.status() != WL_CONNECTED) {
-    if (millis() - startAttemptTime >= timeout) {
-      Serial.println(
-          "\nFailed to connect to WiFi. Check password or network try again.");
-      break;
-    }
-    Serial.print(".");
-    delay(100);
+  bool connected = _connectToWifi(receivedSSID, receivedPassword);
+
+  if (connected) {
+    // Store the credentials permanently.
+    storeCredentials(receivedSSID, receivedPassword);
+    Serial.println("\nConnected to the WiFi network");
+    Serial.print("Local ESP32 IP: ");
+    Serial.println(WiFi.localIP());
+    return true;
+  } else {
+    Serial.print("Failed to c");
+    return false;
   }
-
-  Serial.println("\nConnected to the WiFi network");
-  // Store the credentials permanently.
-  storeCredentials(receivedSSID, receivedPassword);
-  
-  Serial.print("Local ESP32 IP: ");
-  Serial.println(WiFi.localIP());
-
-  return true;
 }
 
-/**
- * Waits until a client makes a request.
- */
 // TODO: Add verification. Not necessary now but never know
 void connectClients() {
   WiFiClient client = server.available();
