@@ -51,7 +51,7 @@ namespace Camera {
   camera_fb_t *take_photo() {
     camera_fb_t *fb;
     fb = esp_camera_fb_get();
-
+    
     return fb;
   }
 

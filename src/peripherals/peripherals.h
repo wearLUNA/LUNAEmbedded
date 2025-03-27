@@ -1,6 +1,8 @@
 #pragma once
 #include <Arduino.h>
 
+// TODO: this entire part needs work
+// The haptic code doesn't work.
 namespace Touch {
 
   #define TOUCH_PIN D0

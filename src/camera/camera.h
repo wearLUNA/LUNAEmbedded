@@ -37,7 +37,19 @@ namespace Camera {
    */
   esp_err_t initalize_camera(camera_config_t *config);
 
+  /**
+   * @brief Takes a photo and returns the frame buffer object
+   * 
+   * Frame buffer must be returned after use by calling `return_fb(fb)`
+   * 
+   * @return camera_fb_t* pointer to the frame buffer object
+   */
   camera_fb_t *take_photo();
 
+  /**
+   * @brief Return the captured frame bufer to the camera
+   * 
+   * @param fb pointer to the frame buffer
+   */
   void return_fb(camera_fb_t *fb);
 }

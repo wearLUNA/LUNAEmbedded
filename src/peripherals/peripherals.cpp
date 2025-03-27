@@ -18,14 +18,11 @@ namespace Haptic {
   }
 
   void HapticMotor::setup() {
-    Serial.println(pin);
     pinMode(pin, OUTPUT);
     start_task();
   }
 
   void HapticMotor::vibe() {
-    Serial.println(pin);
-    Serial.println("vibed");
     digitalWrite(pin, HIGH);
   }
 
