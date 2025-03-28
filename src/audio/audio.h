@@ -89,6 +89,8 @@ namespace Audio {
        */
       bool setOutVolume(float vol);
 
+      void flushSpeakerBuffer();
+
       /**
        * @brief Loop function to be called in the main loop
        * 

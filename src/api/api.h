@@ -52,7 +52,7 @@ namespace API {
       /**
        * @brief Begins a stream describe request
        * 
-       * The function makes and http request to the "/describe-stream" endpoint.
+       * The function makes an http request to the "/describe-stream" endpoint.
        * It captures a frame from the camera and sends as binary payload.
        * 
        * @return true if successful
@@ -84,6 +84,9 @@ namespace API {
       const char *serverUrl;                  // Default SERVER_URL
 
       TaskHandle_t wsTaskHandle = nullptr;    // Handle of the websocket task spawn on successful connection
+
+      int connectionStart = 0;
+      int loopNum = 0;
 
       /**
        * @brief Websocket task for sending and receiving data
@@ -149,6 +152,8 @@ namespace API {
        * @return false if socket is not connected
        */
       bool isConnected();
+
+      void loop();
   };
 
 }

@@ -30,7 +30,6 @@ namespace Audio {
     outConfig.port_no = I2S_NUM_1;
     out.begin(outConfig);
 
-
     eqConfig = eq.defaultConfig();
     eqConfig.copyFrom(outConfig);
     eqConfig.gain_high = 0.5;
@@ -55,6 +54,10 @@ namespace Audio {
 
   bool AudioIO::setOutVolume(float vol) {
     return volumeOut.setVolume(vol);
+  }
+
+  void AudioIO::flushSpeakerBuffer() {
+    queueOut.flush();
   }
 
   void AudioIO::loop() {

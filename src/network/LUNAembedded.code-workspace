@@ -1,0 +1,17 @@
+{
+	"folders": [
+		{
+			"path": "../../.."
+		},
+		{
+			"name": "LunaEmbedded",
+			"path": "../.."
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"ostream": "cpp",
+			"print": "cpp"
+		}
+	}
+}

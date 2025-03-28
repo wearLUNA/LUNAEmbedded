@@ -99,6 +99,7 @@ namespace API {
       case WStype_BIN:
         // we got audio data back in binary
         // write to audio
+        Serial.println("got audio");
         audio.write(payload, length);
         break;
       case WStype_TEXT:
@@ -150,14 +151,12 @@ namespace API {
   void LiveClient::endLive() {
     processing = false;
     webSocket.disconnect();
-    if (wsTaskHandle != nullptr) {
-      vTaskDelete(wsTaskHandle);
-      wsTaskHandle = nullptr;
-    }
   }
 
   void LiveClient::websocketEventWrapper(WStype_t type, uint8_t * payload, size_t length, void* ptr) {
     LiveClient* instance = static_cast<LiveClient*>(ptr);
+    Serial.println("Event received");
+    Serial.println(instance->processing);
     instance->websocketEvent(type, payload, length);
   }
 
@@ -169,7 +168,7 @@ namespace API {
     auto connectionStart = millis();
     int loopNum = 0;
 
-    while (millis() - connectionStart < MAX_WEBSOCKET_TIME) {
+    while (millis() - connectionStart < MAX_WEBSOCKET_TIME && processing) {
       webSocket.loop();
 
       if (loopNum > 75) {
@@ -182,7 +181,6 @@ namespace API {
         Camera::return_fb(fb);
         loopNum = 0;
       }
-      
       // TODO: get mic data, transform into base64 and send to websocket
       audio.read();
       String encoded = base64::encode(audio.bufferIn, IN_BUFFER_SIZE);
@@ -193,6 +191,7 @@ namespace API {
       loopNum++;
     }
 
+    audio.flushSpeakerBuffer();
     processing = false;
     webSocket.disconnect();
     vTaskDelete(NULL);
