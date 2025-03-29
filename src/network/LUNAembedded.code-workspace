@@ -11,7 +11,11 @@
 	"settings": {
 		"files.associations": {
 			"ostream": "cpp",
-			"print": "cpp"
+			"print": "cpp",
+			"cstdlib": "cpp",
+			"filesystem": "cpp",
+			"variant": "cpp",
+			"istream": "cpp"
 		}
 	}
 }

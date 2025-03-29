@@ -68,6 +68,7 @@ bool connectToWifi() {
   
   bool connected = _connectToWifi(preferences.getString("ssid"),
                                   preferences.getString("password"));
+
   preferences.end();
   if (connected) {
     Serial.println("\nConnected to the WiFi network");
@@ -86,16 +87,17 @@ bool connectToWifi() {
 
 bool _connectToWifi(const String &ssid, const String &password) {
   unsigned long startAttemptTime = millis();
-  const unsigned long timeout = 20000; // 20 seconds
+  const unsigned long timeout = 5000; // 5 seconds
 
   WiFi.begin(ssid, password);
-  if (millis() - startAttemptTime >= timeout) {
-    while (WiFi.status() != WL_CONNECTED) {
-      return false;
-    }
+  unsigned long startTime = millis();
+  char print_buf[30];
+  Serial.println("Trying to connect to " + ssid + " pwd: " + password);
+  while (WiFi.status() != WL_CONNECTED && (millis() - startTime < timeout) ) {
     Serial.print(".");
     delay(100);
   }
+  if(WiFi.status() != WL_CONNECTED) return false;
   return true;
 }
 

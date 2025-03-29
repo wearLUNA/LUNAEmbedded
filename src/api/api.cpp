@@ -150,7 +150,8 @@ namespace API {
 
   void LiveClient::endLive() {
     processing = false;
-    webSocket.disconnect();
+    
+    // webSocket.disconnect();
   }
 
   void LiveClient::websocketEventWrapper(WStype_t type, uint8_t * payload, size_t length, void* ptr) {
@@ -162,6 +163,7 @@ namespace API {
 
   void LiveClient::websocketTask() {
     while (!webSocket.isConnected()) {
+      if(!processing) break;
       webSocket.loop();
     }
     
@@ -190,7 +192,7 @@ namespace API {
 
       loopNum++;
     }
-
+    
     audio.flushSpeakerBuffer();
     processing = false;
     webSocket.disconnect();

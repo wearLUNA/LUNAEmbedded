@@ -123,6 +123,8 @@ namespace API {
        */
       LiveClient(Audio::AudioIO& audioRef, String authToken, const char *serverUrl = SERVER_URL);
 
+      void setup();
+
       /**
        * @brief Begins the websocket connection
        * 

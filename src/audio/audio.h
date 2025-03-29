@@ -12,7 +12,7 @@ namespace Audio {
   #define I2S_WS_IN 42
   #define I2S_DOUT_IN 41
 
-  #define OUT_BUFFER_SIZE 1024 * 10       // Size of speaker buffer
+  #define OUT_BUFFER_SIZE 1024 * 100       // Size of speaker buffer
   #define IN_BUFFER_SIZE 1024             // Size of mic buffer
 
   class AudioIO {

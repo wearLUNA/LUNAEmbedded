@@ -95,6 +95,7 @@ class BufferRTOS : public BaseBuffer<T> {
   int writeArray(const T data[], int len) {
     LOGD("%s: %d", LOG_METHOD, len);
     if (write_from_isr) {
+      Serial.println("write from isr");
       xHigherPriorityTaskWoken = pdFALSE;
       int result =
           xStreamBufferSendFromISR(xStreamBuffer, (void *)data, sizeof(T) * len,
@@ -106,6 +107,7 @@ class BufferRTOS : public BaseBuffer<T> {
 #endif
       return result / sizeof(T);
     } else {
+      Serial.println("something else");
       return xStreamBufferSend(xStreamBuffer, (void *)data, sizeof(T) * len,
                                writeWait) / sizeof(T);
     }
