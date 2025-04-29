@@ -38,6 +38,7 @@ void storeCredentials(const char *newSSID, const char *newPassword) {
 bool hasWifiCreds() {
   preferences.begin("wifiCreds", false);
   String storedSSID = preferences.getString("ssid", "");
+  Serial.println(storedSSID);
   preferences.end();
 
   return storedSSID != "";
@@ -60,6 +61,7 @@ bool connectToWifi() {
 
   preferences.begin("wifiCreds", true);
   if (!isNetworkVisible(preferences.getString("ssid"))) {
+    Serial.println(preferences.getString("ssid"));
     Serial.println("\nNetwork not found. Check if the WiFi is in range.");
     return false;
   }
@@ -70,6 +72,8 @@ bool connectToWifi() {
   if (connected) {
     Serial.println("\nConnected to the WiFi network");
     Serial.print("Local ESP32 IP: ");
+    delay(500);
+
     Serial.println(WiFi.localIP());
     return true;
   } else {
