@@ -9,10 +9,8 @@
 static const char *AP_SSID = "LUNA-DEVICE";
 static const char *AP_PASSWORD = "123412341234";
 
-// Server to host the Access Point
 WiFiServer server(80);
 
-// For persistent data
 Preferences preferences;
 
 namespace AccessPoint {
@@ -82,7 +80,7 @@ bool connectToWifi() {
 
 bool _connectToWifi(const String &ssid, const String &password) {
   unsigned long startAttemptTime = millis();
-  const unsigned long timeout = 20000; // 20 seconds
+  const unsigned long timeout = 20000;
 
   WiFi.begin(ssid, password);
   if (millis() - startAttemptTime >= timeout) {
@@ -115,15 +113,12 @@ bool isNetworkVisible(const String &targetSSID) {
  */
 bool processHeader(const char *headerPtr, int *contentLength,
                    bool *isPostConnect) {
-  // Check for "POST /connect" in the header.
   if (strstr(headerPtr, "POST /connect") != nullptr) {
     *isPostConnect = true;
-    // Find "Content-Length: " within the header.
     const char *clPtr = strstr(headerPtr, "Content-Length: ");
     if (clPtr != nullptr) {
       clPtr +=
-          strlen("Content-Length: "); // move pointer past header field name
-      // atoi will convert the number until a non-digit is found.
+          strlen("Content-Length: "); 
       *contentLength = atoi(clPtr);
     }
   } else {
@@ -136,7 +131,6 @@ bool processHeader(const char *headerPtr, int *contentLength,
  * Helper function for connectClients(). Processes incoming JSON payload
  */
 bool processJsonPayload(const char *payload) {
-  // Create a JSON document with enough capacity for your payload.
   JsonDocument doc;
   DeserializationError error = deserializeJson(doc, payload);
   if (error) {
@@ -145,7 +139,6 @@ bool processJsonPayload(const char *payload) {
     return false;
   }
 
-  // Extract the SSID and password from the JSON.
   const char *receivedSSID = doc["ssid"];
   const char *receivedPassword = doc["password"];
 
@@ -156,13 +149,11 @@ bool processJsonPayload(const char *payload) {
   Serial.println(receivedPassword);
 
   unsigned long startAttemptTime = millis();
-  // Optionally connect to the new WiFi network immediately.
-  const unsigned long timeout = 20000; // 20 seconds
+  const unsigned long timeout = 20000;
 
   bool connected = _connectToWifi(receivedSSID, receivedPassword);
 
   if (connected) {
-    // Store the credentials permanently.
     storeCredentials(receivedSSID, receivedPassword);
     Serial.println("\nConnected to the WiFi network");
     Serial.print("Local ESP32 IP: ");
@@ -180,7 +171,7 @@ void connectClients() {
 
   if (client) {
     Serial.println("New Client.");
-    String currentLine = ""; // To hold incoming data from the client
+    String currentLine = ""; 
     bool isPostConnect = false;
     int contentLength = 0;
     bool jsonReceived = false;
@@ -191,7 +182,6 @@ void connectClients() {
       if (client.available()) {
         char c = client.read();
         header += c;
-        // Detect end of header (a blank line)
         if (c == '\n') {
           if (currentLine.length() == 0) {
             processHeader(header.c_str(), &contentLength, &isPostConnect);
@@ -206,10 +196,8 @@ void connectClients() {
       }
     }
 
-    // If it was a POST request, try to read the JSON body
     if (isPostConnect && contentLength > 0) {
       unsigned long startTime = millis();
-      // Wait for the body to become available
       while (client.available() < contentLength &&
              (millis() - startTime) < 2000) {
         delay(10);
@@ -223,7 +211,6 @@ void connectClients() {
       jsonReceived = true;
     }
 
-    // If we received JSON, parse it using ArduinoJson
     if (jsonReceived) {
       processJsonPayload(body.c_str());
 

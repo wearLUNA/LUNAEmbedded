@@ -1,32 +1,12 @@
 #include <Arduino.h>
-#include "./network/accesspoint.h"
-
-// On first initialization, to avoid error spamming, we use this variable in the loop() function
-bool useAccessPoint = false;
+#include "./network/bluetooth.h"
 
 void setup() {
   Serial.begin(115200);
-  delay(2000);
-  if (!AccessPoint::hasWifiCreds()) {
-    Serial.println("No Wifi credentials found. Starting server.");
-    AccessPoint::setupAccessPoint();
-    useAccessPoint = true;
-  } else {
-    bool connected = AccessPoint::connectToWifi();
-    if (!connected) {
-      Serial.println("Starting Server");
-      AccessPoint::setupAccessPoint();
-      useAccessPoint = true;
-    }
-  }
+  delay(5000);
+  log_i("Setup Begun");
+  BLEConnector::BLESetup();
 }
 
 void loop() {
-  while (!Serial) {
-    ;
-  }
-
-  if (useAccessPoint) {
-    AccessPoint::connectClients();
-  }
 }
