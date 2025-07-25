@@ -2,10 +2,14 @@
 
 Firmware for the LUNA wearable device, running on an ESP32‑S3, that captures images and streams them to a cloud API. It exposes a BLE control interface for provisioning and file transfer, runs camera & audio drivers, and handles HTTP & WebSocket communication.
 
+**GitHub Organization**: [wearLUNA](https://github.com/wearLUNA)  
+**LinkedIn**: [LUNA Wearables](https://www.linkedin.com/company/lunawearables/)  
+**Website**: [wearluna.ca](https://www.wearluna.ca/)
+
 <p align="center">
   <img src="luna_device.jpg" alt="LUNA Wearable Device" width="400"/>
+  <img src="lunaontable.jpg" alt="LUNA Wearable Device" width="400"/>
 </p>
-
 
 ---
 
